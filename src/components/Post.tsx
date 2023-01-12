@@ -1,12 +1,29 @@
 import { format, formatDistanceToNow } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
-import { useState } from 'react';
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 
 import { Avatar } from './Avatar';
 import { Comment } from './Comment';
 import styles from './Post.module.css';
 
-export function Post({ author, content, publishedAt }) {
+interface IAutor {
+  name: string;
+  role: string;
+  avatarUrl: string;
+}
+
+interface IContent {
+  type: string;
+  content: string;
+}
+
+interface IPostProps {
+  author: IAutor;
+  publishedAt: Date;
+  content: IContent[];
+}
+
+export function Post({ author, content, publishedAt }: IPostProps) {
   const [comments, setComments] = useState(['Post muito bacana em?']);
   const [newCommentText, setNewCommentText] = useState('');
 
@@ -22,25 +39,25 @@ export function Post({ author, content, publishedAt }) {
     locale: ptBR,
   });
 
-  function handleCreateNewComment() {
+  function handleCreateNewComment(event: FormEvent) {
     event.preventDefault();
     setComments([...comments, newCommentText]);
     setNewCommentText('');
   }
 
-  function handleNewCommentChange() {
+  function handleNewCommentChange(event: ChangeEvent<HTMLTextAreaElement>) {
     setNewCommentText(event.target.value);
     event.target.setCustomValidity('');
   }
 
-  function deleteComment(commentToDelete) {
+  function deleteComment(commentToDelete: string) {
     const commentsWithoutDeleteOne = comments.filter(
       (comment) => comment !== commentToDelete,
     );
     setComments(commentsWithoutDeleteOne);
   }
 
-  function handleNewCommentInvalid() {
+  function handleNewCommentInvalid(event: InvalidEvent<HTMLTextAreaElement>) {
     event.target.setCustomValidity('Esse campo é obrigatório!');
   }
 
@@ -59,7 +76,7 @@ export function Post({ author, content, publishedAt }) {
 
         <time
           title={publishedDateFormatted}
-          dataTime={publishedAt.toISOString()}
+          dateTime={publishedAt.toISOString()}
         >
           Publicado há {publishedDateRelativToNow}
         </time>
